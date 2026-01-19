@@ -1,5 +1,6 @@
 import React from 'react';
-import { Trash2, Shuffle, Moon, Sun, Upload, Grid, Terminal, Save } from 'lucide-react';
+// [修改] 引入 LayoutGrid (grid_view) 和 Plus (+)
+import { Trash2, Shuffle, Moon, Sun, Plus, LayoutGrid, Terminal } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const TopNav = ({ 
@@ -8,21 +9,58 @@ export const TopNav = ({
   onToggleTheme, 
   isDarkMode,
   onImportClick,
-  onRandomClick
+  onRandomClick,
+  currentView,
+  onChangeView,
+  // visualConfig // [修改] 不再需要动态配置，注释掉
 }) => {
+  
+  // [修改] 固定样式配置 (根据你图2的需求调整了混合模式和参数)
+  const fixedButtonStyle = {
+    '--glass-blur': '20px',        // 更强的毛玻璃
+    '--blob-size': '180%',         // 更大的光斑
+    '--blob-speed': '8s',          // 较慢的流动
+    '--blob-spread': '80px',       // 较大的移动幅度
+    '--blend-mode': 'hard-light',  // [关键] 混合模式，让颜色更透亮
+    // 浅色模式固定色
+    '--c1-a': '#ff0000', '--c1-b': '#ffd500',
+    '--c2-a': '#00ffd0', '--c2-b': '#4cd5ff',
+    '--c3-a': '#0037ff', '--c3-b': '#ff00d4',
+    // 深色模式固定色
+    '--c3-a-dark': '#0038FF', '--c3-b-dark': '#FF00D6', // 仅示例，CSS里会自动处理
+  };
+
   return (
     <nav className="sticky top-0 z-50 h-16 transition-all duration-500 group">
-      {/* 背景模糊层 */}
       <div className="absolute inset-0 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-md border-b border-gray-100 dark:border-neutral-900 transition-all duration-500 -z-10 pointer-events-none"></div>
 
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4 relative z-10">
-        {/* 左侧：工具切换 & 回收站 */}
+        {/* 左侧 */}
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="flex items-center bg-gray-100 dark:bg-neutral-900 p-1 rounded-full relative">
-            <button className="p-2 rounded-full transition-all duration-300 bg-white dark:bg-neutral-800 shadow-sm text-black dark:text-white transform scale-105" title="画廊">
-              <Grid size={20} />
+            <button 
+                onClick={() => onChangeView('gallery')}
+                className={cn(
+                    "p-2 rounded-full transition-all duration-300",
+                    currentView === 'gallery' 
+                        ? "bg-white dark:bg-neutral-800 shadow-sm text-black dark:text-white transform scale-105" 
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                )} 
+                title="画廊"
+            >
+              {/* [修改] 图标改为 LayoutGrid */}
+              <LayoutGrid size={20} />
             </button>
-            <button className="p-2 rounded-full transition-all duration-300 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" title="爬虫工具 (暂未迁移)">
+            <button 
+                onClick={() => onChangeView('scraper')}
+                className={cn(
+                    "p-2 rounded-full transition-all duration-300",
+                    currentView === 'scraper' 
+                        ? "bg-white dark:bg-neutral-800 shadow-sm text-black dark:text-white transform scale-105" 
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                )}
+                title="爬虫工具"
+            >
               <Terminal size={20} />
             </button>
           </div>
@@ -34,39 +72,34 @@ export const TopNav = ({
             <Trash2 size={18} />
             <span>({recycleCount})</span>
           </button>
-          
-          {/* 保存指示器 (静态展示) */}
-          <span className="text-xs text-green-500 animate-pulse hidden flex items-center gap-1">
-            <Save size={12} /> 已保存
-          </span>
         </div>
 
-        {/* 中间：滚动时合并的控制栏 (暂时留空，后续做高级交互) */}
-        <div className="hidden md:flex items-center gap-4 opacity-0 pointer-events-none"></div>
-
-        {/* 右侧：随机、导入、主题 */}
+        {/* 右侧 */}
         <div className="flex items-center gap-4 flex-shrink-0">
-          {/* 随机按钮 (带流体光斑效果) */}
-          <button 
-            className="btn-random-glass group relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm overflow-hidden isolate" 
-            onClick={onRandomClick}
-            title="随机打开一个条目"
-          >
-            <span className="glass-blob blob-1"></span>
-            <span className="glass-blob blob-2"></span>
-            <span className="glass-blob blob-3"></span>
-            
-            <span className="relative z-10 flex items-center gap-1.5 text-shadow-sm">
-              <Shuffle size={18} />
-              <span className="hidden sm:inline">随机</span>
-            </span>
-          </button>
+          {/* 随机按钮：使用 fixedButtonStyle */}
+          <div className="btn-random-wrapper" style={fixedButtonStyle}>
+              <button 
+                className="btn-random-glass group relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm overflow-hidden isolate" 
+                onClick={onRandomClick}
+              >
+                {/* 默认开启所有 Blob */}
+                <span className="glass-blob blob-1"></span>
+                <span className="glass-blob blob-2"></span>
+                <span className="glass-blob blob-3"></span>
+                
+                <span className="relative z-10 flex items-center gap-1.5 text-shadow-sm">
+                  <Shuffle size={18} />
+                  <span className="hidden sm:inline">随机</span>
+                </span>
+              </button>
+          </div>
           
           <button 
             className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-full text-xs font-bold uppercase tracking-wider hover:scale-105 transition-transform shadow-lg" 
             onClick={onImportClick}
           >
-            <Upload size={14} />
+            {/* [修改] 图标改为 Plus */}
+            <Plus size={16} strokeWidth={3} />
             <span className="hidden sm:inline">导入</span>
           </button>
           

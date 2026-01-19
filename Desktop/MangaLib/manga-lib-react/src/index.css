@@ -88,3 +88,95 @@ body {
 .star-manga-btn:hover {
     transform: scale(1.15);
 }
+/* --- Dynamic Random Button Styles --- */
+.btn-random-wrapper {
+    /* 默认值，会被 React 内联样式覆盖 */
+    --glass-blur: 16px;
+    --glass-opacity: 0.1;
+    --blob-speed: 4s;
+    --blob-size: 150%;
+    --blob-spread: 50%; /* 间距控制 */
+    --blend-mode: normal;
+    
+    /* 浅色模式颜色 */
+    --c1-a: #ff0000; --c1-b: #ffd500;
+    --c2-a: #00ffd0; --c2-b: #4cd5ff;
+    --c3-a: #0037ff; --c3-b: #ff00d4;
+    
+    position: relative;
+    display: inline-block;
+}
+
+/* 深色模式下的颜色变量重写 */
+.dark .btn-random-wrapper {
+    --c1-a: #FF0000; --c1-b: #FFD600;
+    --c2-a: #00FFD1; --c2-b: #0088B3;
+    --c3-a: #0038FF; --c3-b: #FF00D6;
+    --glass-opacity: 0.2;
+}
+
+.btn-random-glass {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+    
+    /* 动态毛玻璃 */
+    background: radial-gradient(circle at center, rgba(255,255,255, var(--glass-opacity)) 0%, rgba(255,255,255, 0.02) 100%);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.btn-random-glass:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255,255,255,0.4);
+}
+
+.text-shadow-sm { 
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); 
+    font-weight: 800;
+    position: relative;
+    z-index: 10;
+}
+
+/* Blobs */
+.glass-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 1;
+    z-index: -1;
+    width: var(--blob-size);
+    height: var(--blob-size);
+    mix-blend-mode: var(--blend-mode);
+}
+
+.blob-1 {
+    background: linear-gradient(135deg, var(--c1-a), var(--c1-b));
+    animation: moveBlob1 var(--blob-speed) ease-in-out infinite alternate;
+    top: -20%; left: -20%;
+}
+.blob-2 {
+    background: linear-gradient(135deg, var(--c2-a), var(--c2-b));
+    animation: moveBlob2 calc(var(--blob-speed) * 1.25) ease-in-out infinite alternate-reverse;
+    top: -20%; right: -20%;
+}
+.blob-3 {
+    background: linear-gradient(135deg, var(--c3-a), var(--c3-b));
+    animation: moveBlob3 calc(var(--blob-speed) * 1.1) linear infinite alternate;
+    bottom: -20%; left: 10%;
+}
+
+/* 动画位移也受 spread 影响 (简化处理，用 calc) */
+@keyframes moveBlob1 { 0% { transform: translate(0,0); } 100% { transform: translate(var(--blob-spread), var(--blob-spread)); } }
+@keyframes moveBlob2 { 0% { transform: translate(0,0); } 100% { transform: translate(calc(var(--blob-spread) * -1), var(--blob-spread)); } }
+@keyframes moveBlob3 { 0% { transform: translate(0,0); } 100% { transform: translate(calc(var(--blob-spread) * 0.5), calc(var(--blob-spread) * -1)); } }
+@keyframes fade-in-scale {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

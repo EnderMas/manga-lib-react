@@ -4,42 +4,39 @@ import { getImageFromDB } from '../lib/db';
 
 export function useMangaData() {
   const [mangaList, setMangaList] = useState([]);
+  const [recycleBin, setRecycleBin] = useState([]); // 新增回收站状态
   const [isLoading, setIsLoading] = useState(true);
+
+  // 辅助：加载列表图片
+  const hydrateList = async (list) => {
+    return await Promise.all(
+      list.map(async (item) => {
+        const blob = await getImageFromDB(item.id);
+        const imgUrl = blob ? URL.createObjectURL(blob) : '';
+        return { ...item, img: imgUrl };
+      })
+    );
+  };
 
   // 加载数据的核心逻辑
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // 1. 从 LocalStorage 获取元数据 (标题, 作者, Tags...)
+      // 1. 读取 LocalStorage
       const storedList = JSON.parse(localStorage.getItem('mangaList') || '[]');
-      
-      if (storedList.length === 0) {
-        setMangaList([]);
-        setIsLoading(false);
-        return;
-      }
+      const storedRecycle = JSON.parse(localStorage.getItem('recycleBin') || '[]');
 
-      // 2. 遍历列表，去 IndexedDB 找对应的图片
-      const fullList = await Promise.all(
-        storedList.map(async (item) => {
-          // 尝试获取图片 Blob
-          const blob = await getImageFromDB(item.id);
-          
-          // 如果找到了图片，创建一个临时的 URL (blob:http://...)
-          // 如果没找到，就给一个空字符串或者占位符
-          const imgUrl = blob ? URL.createObjectURL(blob) : '';
-          
-          return {
-            ...item,
-            img: imgUrl, // 替换原本可能为空的 img 字段
-          };
-        })
-      );
+      // 2. 并行加载图片
+      const [fullList, fullRecycle] = await Promise.all([
+        hydrateList(storedList),
+        hydrateList(storedRecycle)
+      ]);
 
       // 3. 更新状态
       setMangaList(fullList);
+      setRecycleBin(fullRecycle);
     } catch (error) {
-      console.error("Failed to load manga data:", error);
+      console.error("Failed to load data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -57,5 +54,12 @@ export function useMangaData() {
     };
   }, []); // 空数组表示只在初始化时执行一次
 
-  return { mangaList, isLoading, reloadData: loadData };
+  return { 
+    mangaList, 
+    setMangaList, // 暴露 setter 以便 App.jsx 修改
+    recycleBin, 
+    setRecycleBin, // 暴露 setter
+    isLoading, 
+    reloadData: loadData 
+  };
 }
