@@ -180,3 +180,14 @@ body {
 .animate-fade-in-scale {
   animation: fade-in-scale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+
+/* --- NSFW Tag Colors --- */
+:root {
+  --nsfw-primary: #ff5d8f; /* 浅色模式主题色 */
+  --nsfw-active-text: #ffffff;
+}
+
+.dark {
+  --nsfw-primary: #ffc4d6; /* 深色模式主题色 */
+  --nsfw-active-text: #000000; /* 深色模式下背景亮，文字用黑色 */
+}

@@ -18,10 +18,10 @@ export const TopNav = ({
   // [修改] 固定样式配置 (根据你图2的需求调整了混合模式和参数)
   const fixedButtonStyle = {
     '--glass-blur': '20px',        // 更强的毛玻璃
-    '--blob-size': '180%',         // 更大的光斑
-    '--blob-speed': '8s',          // 较慢的流动
-    '--blob-spread': '80px',       // 较大的移动幅度
-    '--blend-mode': 'hard-light',  // [关键] 混合模式，让颜色更透亮
+    '--blob-size': '80%',         // 更大的光斑
+    '--blob-speed': '5s',          // 较慢的流动
+    '--blob-spread': '100px',       // 较大的移动幅度
+    '--blend-mode': 'multiply',  // [关键] 混合模式，让颜色更透亮
     // 浅色模式固定色
     '--c1-a': '#ff0000', '--c1-b': '#ffd500',
     '--c2-a': '#00ffd0', '--c2-b': '#4cd5ff',
